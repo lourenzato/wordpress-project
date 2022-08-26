@@ -1,0 +1,31 @@
+#criacao do arquivo de compose
+version: "3.8" #define a versao do compose
+
+services: #servicos da aplicacao/os containers que vao rodar
+    db: #nome do container de MySQL - vai ser o database utilizado para armazenar o conteudo (muito utilizado em aplicacoes web)
+        image: mysql:5.7 #definindo a imagem do container e a sua versao
+        volumes: #para os dados serem salvos
+          - db_data:/var/lib/mysql #o volume chamado de db_data vai estar nesse caminho
+        restart: always #garantir que o compose vai continuar rodando sempre no arquivo na sua ultima atualizacao/todas as alteracoes feitas aqui vao ser automaticamente atualizadas
+        environment: #configuracoes do banco de dados - comandos da documentacao do mysql
+          MYSQL_ROOT_PASSWORD: wordpress #vai definir uma senha no root do wordpress
+          MYSQL_DATABASE: wordpress #vai criar uma base de dados do wordpress
+          MYSQL_USER: lorena #vai criar um usuario
+          MYSQL_PASSWORD: admin #define a senha
+    
+    wordpress: #container wordpress
+        depends_on: #qual servico ou container o wordpress depende
+        - db   #depende do banco de dados do mysql
+        image: wordpress:latest #ultima versao da imagem do wordpress
+        ports:
+          - "8000:80" #acesso na web - porta 8000 do pc e 80 da config
+        #a porta 80 e utilizada em aplicacoes web 
+        restart: always
+        environment: #para realizar a conexao com o mysql
+          WORDPRESS_DB_HOST: db:3306 #porta padrao
+          WORDPRESS_DB_USER: lorena #usa-se as mesmas credenciais para acessar o banco de dados criado
+          WORDPRESS_DB_PASSWORD: admin
+          WORDPRESS_DB_NAME: wordpress
+volumes:
+    db_data: #criacao do banco de dados - deve-se declarar todos os volumes da aplicacao no compose
+    #diz para o docker compose que ele deve iniciar uma base de dados
